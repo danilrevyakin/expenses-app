@@ -59,6 +59,10 @@ jobs:
       - name: Git clone the repository
         uses: actions/checkout@v4
       
+      - name: Transfer Docker image to EC2
+        run: |
+          scp -i ${{ secrets.EC2_KEY }} /tmp/flask-app-image.tar ec2-user@${{ secrets.EC2_HOST }}:/home/ec2-user/
+      
       - name: executing remote ssh commands using password  
         uses: appleboy/ssh-action@v0.1.7
         with:
@@ -69,8 +73,7 @@ jobs:
           script: |
             cd expenses-app
             sudo systemctl start docker
-            scp /tmp/flask-app-image.tar ${{ secrets.EC2_USER }}@${{ secrets.EC2_HOST }}:/tmp/flask-app-image.tar
-            sudo docker load --input /tmp/flask-app-image.tar
+            sudo docker load --input /home/ec2-user/flask-app-image.tar
             sudo docker stop flask-app || true
             sudo docker rm flask-app || true
             sudo docker run -d --name flask-app -p 80:5000 flask-app-image

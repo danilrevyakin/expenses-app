@@ -25,7 +25,7 @@ jobs:
       - name: Build Docker image
         run: |
           docker build -t flask-app:${{ github.sha }} .
-          docker save flask-app:${{ github.sha }} > flask-app.tar
+          docker save -o flask-app.tar flask-app:${{ github.sha }}
 
       - name: Save Docker image as artifact
         uses: actions/upload-artifact@v4

@@ -29,13 +29,13 @@ jobs:
         uses: docker/build-push-action@v6
         with:
           tags: flask-app-image:latest
-          outputs: type=docker,dest=./flask-app-image.tar
+          outputs: type=docker,dest=/tmp/flask-app-image.tar
 
       - name: Save Docker image as artifact
         uses: actions/upload-artifact@v4
         with:
           name: flask-app-image
-          path: ./flask-app-image.tar
+          path: /tmp/flask-app-image.tar
 
   deploy:
     runs-on: ubuntu-latest
@@ -45,12 +45,7 @@ jobs:
         uses: actions/download-artifact@v4
         with:
           name: flask-app-image
-          path: ./flask-app-image.tar
-
-      - name: Verify tar file
-        run: |
-          file flask-app-image.tar
-          ls -lh flask-app-image.tar
+          path: /tmp
       
       - name: Start and verify Docker service
         run: |
@@ -59,7 +54,7 @@ jobs:
 
       - name: Load Docker image
         run: |
-          sudo docker load --input flask-app-image.tar
+          sudo docker load --input /tmp/flask-app-image.tar
 
       - name: Deploy to AWS EC2
         env:

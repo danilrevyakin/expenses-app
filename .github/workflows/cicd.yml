@@ -55,12 +55,16 @@ jobs:
       - name: Load Docker image
         run: |
           sudo docker load --input /tmp/flask-app-image.tar
+      
+      - name: Setup SSH
+        uses: webfactory/ssh-agent@v0.5.0
+        with:
+          ssh-private-key: ${{ secrets.SSH_PRIVATE_KEY }}
+      
+      - name: Add EC2 host to known hosts
+        run: ssh-keyscan -H ${{ secrets.INSTANCE_IP }}>> ~/.ssh/known_hosts
 
       - name: Deploy to AWS EC2
-        env:
-          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
-          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          INSTANCE_IP: ${{ secrets.INSTANCE_IP }}
         run: |
-         ssh -o StrictHostKeyChecking=no ec2-user@${{ env.INSTANCE_IP }} \
-          "docker run -d -p 80:5000 flask-app:${{ github.sha }}"
+          ssh ${{ secrets.ES2_USER }}@${{ secrets.INSTANCE_IP }} \
+          "cd /home/ec2-user/expenses-app && docker run -d -p 80:5000 flask-app-image"

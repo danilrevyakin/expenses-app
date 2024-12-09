@@ -63,11 +63,23 @@ jobs:
       - name: Git clone the repository
         uses: actions/checkout@v4
       
-      - name: Configure AWS credentials
-        uses: aws-actions/configure-aws-credentials@v4
+      - name: executing remote ssh commands using password  
+        uses: appleboy/ssh-action@v0.1.7
         with:
-          role-to-assume: arn:aws:iam::140487096708:role/action_helper
-          aws-region: eu-central-1
+          host: ${{ secrets.EC2_HOST }}  
+          username: ${{ secrets.EC2_USER }}  
+          key: ${{ secrets.EC2_KEY }} 
+          port: 22
+      
+      # - name: Configure AWS credentials
+      #   uses: aws-actions/configure-aws-credentials@v4
+      #   with:
+      #     role-to-assume: arn:aws:iam::140487096708:role/action_helper
+      #     aws-region: eu-central-1
+
+      - name: hi
+        run: |
+          ls
       
       
       - name: Deploy to AWS EC2

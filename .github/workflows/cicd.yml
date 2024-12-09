@@ -69,6 +69,10 @@ jobs:
           role-to-assume: arn:aws:iam::140487096708:role/action_helper
           aws-region: eu-central-1
 
+      - name: Smth project
+        run: |
+          "ls"
+      
       - name: Visit project
         run: |
           "cd /home/ec2-user/ && ls"

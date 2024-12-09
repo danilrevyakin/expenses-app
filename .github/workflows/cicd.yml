@@ -46,8 +46,18 @@ jobs:
       - name: Verify Docker image file
         run: ls -l flask-app.tar
 
-      - name: Start Docker service
-        run: sudo service docker start
+      - name: Start and verify Docker service
+        run: |
+          sudo service docker start
+          sudo docker info
+      
+      - name: Grant Docker socket permissions
+        run: |
+          sudo usermod -aG docker $USER
+          newgrp docker
+
+      - name: Verify Docker socket
+        run: ls -l /var/run/docker.sock
 
       - name: Load Docker image
         run: |

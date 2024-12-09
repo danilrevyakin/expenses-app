@@ -79,7 +79,7 @@ jobs:
 
       - name: hi
         run: |
-          ls
+          mkdir test && ls
       
       
       - name: Deploy to AWS EC2

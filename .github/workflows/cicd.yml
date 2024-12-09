@@ -70,8 +70,8 @@ jobs:
 
       - name: Visit project
         run: |
-          "cd expenses-app && ls"
+          "cd /home/ec2-user/ && ls"
       
       - name: Deploy to AWS EC2
         run: |
-          "docker run -d -p 80:5000 flask-app-image"
+          "cd expenses-app/ && docker run -d -p 80:5000 flask-app-image"

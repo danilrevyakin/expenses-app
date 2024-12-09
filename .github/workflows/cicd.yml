@@ -1,4 +1,4 @@
-name: CI/CD Pipeline for Flask App
+name: CI/CD Pipeline
 
 on:
   push:
@@ -25,14 +25,13 @@ jobs:
       - name: Build Docker image
         run: |
           docker build -t flask-app:${{ github.sha }} .
+          docker save flask-app:${{ github.sha }} > flask-app.tar
 
       - name: Save Docker image as artifact
         uses: actions/upload-artifact@v4
         with:
           name: flask-app-image
           path: ./flask-app.tar
-        run: |
-          docker save flask-app:${{ github.sha }} > flask-app.tar
 
   deploy:
     runs-on: ubuntu-latest

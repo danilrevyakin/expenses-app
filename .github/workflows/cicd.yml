@@ -46,7 +46,7 @@ jobs:
 
       - name: Load Docker image
         run: |
-          docker load < flask-app.tar
+          docker load < ./flask-app.tar
 
       - name: Deploy to AWS EC2
         env:

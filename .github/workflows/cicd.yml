@@ -50,18 +50,10 @@ jobs:
         run: |
           sudo service docker start
           sudo docker info
-      
-      - name: Grant Docker socket permissions
-        run: |
-          sudo usermod -aG docker $USER
-          newgrp docker
-
-      - name: Verify Docker socket
-        run: ls -l /var/run/docker.sock
 
       - name: Load Docker image
         run: |
-          docker load < flask-app.tar
+          sudo docker load < flask-app.tar
 
       - name: Deploy to AWS EC2
         env:

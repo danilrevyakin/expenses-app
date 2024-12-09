@@ -71,8 +71,9 @@ jobs:
           key: ${{ secrets.EC2_KEY }} 
           port: 22
           script: |
-            ls
-      
-      - name: Deploy to AWS EC2
-        run: |
-          sudo docker run -d -p 80:5000 flask-app-image
+            cd expenses-app
+            sudo systemctl start docker
+            sudo docker load --input /tmp/flask-app-image.tar
+            sudo docker stop flask-app || true
+            sudo docker rm flask-app || true
+            sudo docker run -d --name flask-app -p 80:5000 flask-app-image

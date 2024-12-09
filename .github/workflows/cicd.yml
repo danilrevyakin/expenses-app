@@ -68,6 +68,10 @@ jobs:
           role-to-assume: arn:aws:iam::140487096708:role/action_helper
           aws-region: eu-central-1
 
+      - name: Visit project
+        run: |
+          "cd expenses-app && ls"
+      
       - name: Deploy to AWS EC2
         run: |
-          "cd expenses-app && docker run -d -p 80:5000 flask-app-image"
+          "docker run -d -p 80:5000 flask-app-image"

@@ -70,4 +70,4 @@ jobs:
 
       - name: Deploy to AWS EC2
         run: |
-          "ls && cd /home/ec2-user/expenses-app && docker run -d -p 80:5000 flask-app-image"
+          "cd expenses-app && docker run -d -p 80:5000 flask-app-image"

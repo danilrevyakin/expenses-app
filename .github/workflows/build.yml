@@ -23,7 +23,7 @@ jobs:
           docker save flask-app:${{ github.sha }} > flask-app.tar
 
       - name: Upload Artifact
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: flask-app-image
           path: flask-app.tar

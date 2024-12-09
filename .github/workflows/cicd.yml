@@ -53,8 +53,11 @@ jobs:
       
       - name: Start and verify Docker service
         run: |
-          sudo service docker start
+          sudo systemctl start docker
           sudo docker info
+      
+      - name: Check Docker service
+        run: sudo systemctl status docker
 
       - name: Load Docker image
         run: |
@@ -69,9 +72,6 @@ jobs:
           role-to-assume: arn:aws:iam::140487096708:role/action_helper
           aws-region: eu-central-1
       
-      - name: List files
-        run: |
-          "ls"
       
       - name: Deploy to AWS EC2
         run: |

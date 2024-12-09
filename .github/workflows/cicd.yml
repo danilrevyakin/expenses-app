@@ -55,9 +55,6 @@ jobs:
         run: |
           sudo systemctl start docker
           sudo docker info
-      
-      - name: Check Docker service
-        run: sudo systemctl status docker
 
       - name: Load Docker image
         run: |
@@ -75,4 +72,4 @@ jobs:
       
       - name: Deploy to AWS EC2
         run: |
-          "sudo docker run -d -p 80:5000 flask-app-image"
+          sudo docker run -d -p 80:5000 flask-app-image

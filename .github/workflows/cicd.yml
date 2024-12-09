@@ -43,9 +43,11 @@ jobs:
           name: flask-app-image
           path: ./flask-app.tar
 
-      - name: Verify Docker image file
-        run: ls -l flask-app.tar
-
+      - name: Verify tar file
+        run: |
+          file flask-app.tar
+          ls -lh flask-app.tar
+      
       - name: Start and verify Docker service
         run: |
           sudo service docker start
@@ -53,7 +55,7 @@ jobs:
 
       - name: Load Docker image
         run: |
-          sudo docker load < flask-app.tar
+          sudo docker load --input flask-app.tar
 
       - name: Deploy to AWS EC2
         env:

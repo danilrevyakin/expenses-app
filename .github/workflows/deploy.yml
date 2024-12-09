@@ -11,6 +11,9 @@ jobs:
   deploy:
     runs-on: ubuntu-latest
     steps:
+      - name: List Available Artifacts
+        run: ls -l
+        
       - name: Download Artifact
         uses: actions/download-artifact@v3
         with:

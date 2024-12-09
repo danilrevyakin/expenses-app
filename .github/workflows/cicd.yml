@@ -17,15 +17,15 @@ jobs:
       - name: Checkout Code
         uses: actions/checkout@v3
 
-      - name: Set up Python
-        uses: actions/setup-python@v4
-        with:
-          python-version: '3.10'
+      # - name: Set up Python
+      #   uses: actions/setup-python@v4
+      #   with:
+      #     python-version: '3.10'
 
-      - name: Install dependencies
-        run: |
-          python -m pip install --upgrade pip
-          pip install -r requirements.txt
+      # - name: Install dependencies
+      #   run: |
+      #     python -m pip install --upgrade pip
+      #     pip install -r requirements.txt
 
       - name: Login to Docker Hub
         uses: docker/login-action@v3
@@ -38,7 +38,7 @@ jobs:
         with:
           context: .
           push: true
-          tags: ${{ secrets.DOCKER_USERNAME }}/webapp:latest
+          tags: ${{ secrets.DOCKER_USERNAME }}/webapp:${{ github.sha }}
 
   deploy:
     runs-on: ubuntu-latest
@@ -56,10 +56,7 @@ jobs:
           host: ${{ secrets.EC2_HOST }}  
           username: ${{ secrets.EC2_USER }}  
           key: ${{ secrets.EC2_KEY }} 
-          port: 22
           script: |
-            cd expenses-app
-            sudo systemctl start docker
             sudo docker stop webapp || true
             sudo docker rm webapp || true
             docker pull ${{ secrets.DOCKER_USERNAME }}/webapp:${{ github.sha }}

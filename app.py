@@ -16,8 +16,12 @@ app = Flask(__name__)
 # metrics.info('app_info', 'Application info', version='1.0.0')
 
 # Database configuration
-app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql://admin:reallystrongpassword@database-1.cvs4wk28mn9l.eu-central-1.rds.amazonaws.com:3306/expenses_database'
-app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+if os.getenv("TESTING", False):  # Перевірка тестового режиму
+    app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///:memory:'  # SQLite в пам'яті для тестів
+    app.config['TESTING'] = True
+else:
+    app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql://admin:reallystrongpassword@database-1.cvs4wk28mn9l.eu-central-1.rds.amazonaws.com:3306/expenses_database'
+    app.config['TESTING'] = False
 db = SQLAlchemy(app)
 
 # Log directory and file setup

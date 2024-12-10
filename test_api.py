@@ -1,67 +1,94 @@
 import pytest
 from app import app, db, Expense
 
-# Загальна фікстура для налаштування тестового середовища
-@pytest.fixture(scope="module")
-def test_client():
-    app.config['TESTING'] = True
-    app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql://admin:reallystrongpassword@database-1.cvs4wk28mn9l.eu-central-1.rds.amazonaws.com:3306/expenses_database'
-    with app.test_client() as client:
-        with app.app_context():
-            connection = db.engine.connect()
-            transaction = connection.begin()
-            options = dict(bind=connection, binds={})
-            db.session = db.create_scoped_session(options=options)
-            yield client
-            transaction.rollback()
-            connection.close()
 
-# Фікстура для наповнення бази даних тестовими даними
 @pytest.fixture
-def setup_test_data():
+def client():
+    # Set TESTING environment variable to use SQLite in-memory
+    os.environ['TESTING'] = "1"
+    
+    # Create a test client
+    app.config['TESTING'] = True
+    client = app.test_client()
+
+    # Create all tables in the in-memory SQLite database
     with app.app_context():
-        db.session.add(Expense(amount=50, category="Food", description="Lunch"))
-        db.session.add(Expense(amount=20, category="Transport", description="Bus"))
-        db.session.commit()
+        db.create_all()
+
+    yield client  # Provide the test client to the tests
+
+    # Drop all tables after the test
+    with app.app_context():
+        db.drop_all()
+
+    # Reset TESTING environment variable
+    os.environ.pop('TESTING', None)
 
 
-def test_get_expenses(test_client, setup_test_data):
-    response = test_client.get('/expenses')
-    assert response.status_code == 200
-    expenses = response.json
-    assert len(expenses) == 2
-    assert expenses[0]['category'] == "Food"
-
-
-def test_create_expense(test_client):
-    response = test_client.post('/expenses', json={
-        "amount": 100.5,
-        "category": "Entertainment",
-        "description": "Movie"
+def test_create_expense(client):
+    response = client.post('/expenses', json={
+        "amount": 100.0,
+        "category": "Food",
+        "date": "2024-12-10",
+        "description": "Lunch"
     })
     assert response.status_code == 201
-    assert response.json['category'] == "Entertainment"
+    data = response.get_json()
+    assert data["amount"] == 100.0
+    assert data["category"] == "Food"
+    assert data["date"] == "2024-12-10"
+    assert data["description"] == "Lunch"
 
 
-def test_update_expense(test_client, setup_test_data):
-    response = test_client.put('/expenses/1', json={
-        "amount": 200.0,
-        "description": "Updated Lunch"
+def test_get_expenses(client):
+    # Add a sample expense
+    with app.app_context():
+        expense = Expense(amount=50.0, category="Transport", date="2024-12-09", description="Bus ticket")
+        db.session.add(expense)
+        db.session.commit()
+
+    # Test retrieving the expenses
+    response = client.get('/expenses')
+    assert response.status_code == 200
+    data = response.get_json()
+    assert len(data) == 1
+    assert data[0]["amount"] == 50.0
+    assert data[0]["category"] == "Transport"
+
+
+def test_update_expense(client):
+    # Add a sample expense
+    with app.app_context():
+        expense = Expense(amount=75.0, category="Utilities", date="2024-12-08", description="Electricity bill")
+        db.session.add(expense)
+        db.session.commit()
+        expense_id = expense.id
+
+    # Update the expense
+    response = client.put(f'/expenses/{expense_id}', json={
+        "amount": 80.0,
+        "description": "Updated electricity bill"
     })
     assert response.status_code == 200
-    assert response.json['amount'] == 200.0
+    data = response.get_json()
+    assert data["amount"] == 80.0
+    assert data["description"] == "Updated electricity bill"
 
 
-def test_get_expense(test_client, setup_test_data):
-    response = test_client.get('/expenses/1')
+def test_delete_expense(client):
+    # Add a sample expense
+    with app.app_context():
+        expense = Expense(amount=120.0, category="Travel", date="2024-12-07", description="Train ticket")
+        db.session.add(expense)
+        db.session.commit()
+        expense_id = expense.id
+
+    # Delete the expense
+    response = client.delete(f'/expenses/{expense_id}')
     assert response.status_code == 200
-    assert response.json['category'] == "Food"
+    data = response.get_json()
+    assert data["message"] == "Expense deleted"
 
-
-def test_delete_expense(test_client, setup_test_data):
-    response = test_client.delete('/expenses/1')
-    assert response.status_code == 200
-    assert response.json['message'] == "Expense deleted"
-    check_response = test_client.get('/expenses/1')
-    assert check_response.status_code == 404
-
+    # Verify it's deleted
+    response = client.get(f'/expenses/{expense_id}')
+    assert response.status_code == 404

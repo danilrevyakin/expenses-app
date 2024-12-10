@@ -12,8 +12,8 @@ from prometheus_flask_exporter import PrometheusMetrics
 app = Flask(__name__)
 
 # Prometheus metrics setup
-metrics = PrometheusMetrics(app)
-metrics.info('app_info', 'Application info', version='1.0.0')
+# metrics = PrometheusMetrics(app)
+# metrics.info('app_info', 'Application info', version='1.0.0')
 
 # Database configuration
 app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql://admin:reallystrongpassword@database-1.cvs4wk28mn9l.eu-central-1.rds.amazonaws.com:3306/expenses_database'
@@ -21,52 +21,52 @@ app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 db = SQLAlchemy(app)
 
 # Log directory and file setup
-log_dir = "/var/log/webapp"
-os.makedirs(log_dir, exist_ok=True)  # Ensure the log directory exists
-log_file = os.path.join(log_dir, "logs.log")
+# log_dir = "/var/log/webapp"
+# os.makedirs(log_dir, exist_ok=True)  # Ensure the log directory exists
+# log_file = os.path.join(log_dir, "logs.log")
 
 # Root logger configuration
-logging.basicConfig(
-    level=logging.INFO,
-    format='%(asctime)s - %(levelname)s - %(message)s',
-    datefmt='%Y-%m-%d %H:%M:%S UTC'  # Use UTC for consistency in logs
-)
+# logging.basicConfig(
+#     level=logging.INFO,
+#     format='%(asctime)s - %(levelname)s - %(message)s',
+#     datefmt='%Y-%m-%d %H:%M:%S UTC'  # Use UTC for consistency in logs
+# )
 
 # Rotating file handler for logs
-file_handler = RotatingFileHandler(log_file, maxBytes=10 * 1024 * 1024, backupCount=5)
-file_handler.setLevel(logging.INFO)  # Only log INFO and higher level
-file_handler.setFormatter(logging.Formatter('%(asctime)s - %(levelname)s - %(message)s'))
+# file_handler = RotatingFileHandler(log_file, maxBytes=10 * 1024 * 1024, backupCount=5)
+# file_handler.setLevel(logging.INFO)  # Only log INFO and higher level
+# file_handler.setFormatter(logging.Formatter('%(asctime)s - %(levelname)s - %(message)s'))
 
 # Add handler to root logger
-logging.getLogger().addHandler(file_handler)
+# logging.getLogger().addHandler(file_handler)
 
 # Logger for application
-logger = logging.getLogger(__name__)
+# logger = logging.getLogger(__name__)
 
 # Disable Werkzeug logging (set to WARNING to capture only client errors)
-log = logging.getLogger('werkzeug')
-log.setLevel(logging.WARNING)
+# log = logging.getLogger('werkzeug')
+# log.setLevel(logging.WARNING)
 
 # Request logging
-@app.before_request
-def log_request_info():
-    if not request.path.startswith('/metrics'):
-        logger.info(f"Request: {request.method} {request.url} Body: {request.data.decode('utf-8')[:200]}")  # Limit body size for logging
+# @app.before_request
+# def log_request_info():
+#     if not request.path.startswith('/metrics'):
+#         logger.info(f"Request: {request.method} {request.url} Body: {request.data.decode('utf-8')[:200]}")  # Limit body size for logging
 
 
 # Response logging
-@app.after_request
-def log_response_info(response):
-    if not request.path.startswith('/metrics'):
-        logger.info(f"Response: {response.status_code} Response: {response.data.decode('utf-8')[:200]}")  # Limit response size for logging
-    return response
+# @app.after_request
+# def log_response_info(response):
+#     if not request.path.startswith('/metrics'):
+#         logger.info(f"Response: {response.status_code} Response: {response.data.decode('utf-8')[:200]}")  # Limit response size for logging
+#     return response
 
 
 # Error handling with metrics and detailed logging
-@app.errorhandler(Exception)
-def handle_exception(e):
-    logger.error(f"Unhandled exception: {str(e)}", exc_info=True)
-    return jsonify({"message": "An internal error occurred.", "error": str(e)}), 500
+# @app.errorhandler(Exception)
+# def handle_exception(e):
+#     logger.error(f"Unhandled exception: {str(e)}", exc_info=True)
+#     return jsonify({"message": "An internal error occurred.", "error": str(e)}), 500
 
 
 # Expense model

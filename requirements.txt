@@ -4,3 +4,5 @@ Flask-SQLAlchemy
 PyMySQL
 prometheus-flask-exporter==0.21.0
 aws-xray-sdk==2.12.0
+pytest
+requests
